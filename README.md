@@ -1,3 +1,7 @@
+## C++ Version
+
+https://github.com/kahotv/HttpsProxyCpp
+
 ## Build C#
 
 直接编译就行，用的是系统库的Socket和Security实现转发和动态生成证书
@@ -13,9 +17,9 @@
   - 解析WebSocket协议
 
     ```bash
-    WSRequest:00 06 02 00 07 7E 08 00
+    WSRequest : 00 06 02 00 07 7E 08 00
     WSResponse: 00 0F 7E 01 01 02 00 08 00 10 E0 F2 F1 B8 06 08 00
-    WSRequest:00 06 02 00 0A 7B 08 00
+    WSRequest : 00 06 02 00 0A 7B 08 00
     WSResponse: 00 0F AC 01 01 02 00 08 00 10 EF F2 F1 B8 06 08 00
     ```
 
@@ -24,11 +28,12 @@
     ```c#
     async Task<byte[]> TransWebsocketData(string host, byte[] data, bool up)
     {
-    	Console.WriteLine((up ? "WSRequest:" : "WSResponse: ") + Utils.Bin2Hex(data, 0, -1, " "));
-    	return data;
+        string dir = up ? "WSRequest :" : "WSResponse:";
+        Console.WriteLine("{0} {1}", dir, Utils.Bin2Hex(data, 0, -1, " "));
+        return data;
     }
     ```
-
+    
     
 
 # Use
