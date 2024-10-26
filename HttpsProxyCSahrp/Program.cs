@@ -8,6 +8,37 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
 
+/*
+	HTTP 其实就是http连接 但是要处理一下"Proxy-Connection"，一般是替换成"Connection: close"
+
+	Request
+		GET http://c.pki.goog/r/r1.crl HTTP/1.1\r\n
+		Cache-Control: max-age = 3000\r\n
+		Proxy-Connection: Keep-Alive\r\n
+		Accept: * / *\r\n
+		If-Modified-Since: Thu, 25 Jul 2024 14:48:00 GMT\r\n
+		User-Agent: Microsoft-CryptoAPI/10.0\r\n
+		Host: c.pki.goog\r\n
+		\r\n
+	Response
+		...
+*/
+
+/*
+	HTTPS 开头明文的HTTP请求，并且是CONNECT。然后才是建立SSL，成功后基于SSL进行真正的HTTP通信。
+
+	Request
+		CONNECT accounts.google.com:443 HTTP/1.1\r\n
+		Host: accounts.google.com:443\r\n
+		Proxy-Connection: keep-alive\r\n
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36\r\n
+		\r\n
+	Response
+		HTTP/1.1 200 Connection established\r\n
+		\r\n
+
+*/
+
 namespace HttpsProxyCSahrp
 {
     internal class Program
@@ -150,10 +181,9 @@ namespace HttpsProxyCSahrp
 
         static async Task PreTransactAsync(string host, ushort port, Stream streamLocal, Stream streamRemote)
         {
-            // 判断是不是WebSocket
-
             string headers = await Utils.ConsumeHeaderAndProcessProxyConnection(streamLocal, streamRemote);
 
+            // 判断是不是WebSocket
             ITranser transer = IsUpgradeWebSocket(headers)
                 ? new WebSocketTranser()
                 : new SimpleTranser();
@@ -219,7 +249,8 @@ namespace HttpsProxyCSahrp
                         }
 
                     }
-                    else
+                    
+			        if(port == 0)
                     {
                         //没有端口，由协议决定
                         if (vv[1].StartsWith("http://"))

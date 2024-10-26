@@ -153,13 +153,12 @@ namespace HttpsProxyCSharp
 
         public static async Task<string> ConsumeHeaderAndProcessProxyConnection(Stream local,Stream remote)
         {
-            //2.5 处理http的Proxy-Connection
 
             byte[] pattern = new byte[] { 0x0d, 0x0a, 0x0d, 0x0a };
             var headers_bytes = await Utils.ReadUtil(local, pattern,0x1000);
             //Console.WriteLine(Encoding.UTF8.GetString(headers_bytes));
 
-            var type = local.GetType();
+            //处理http的Proxy-Connection
             if (local.GetType() == typeof(NetworkStream))
             {
                 string headers = Utils.ReplaceHttpHeader(
@@ -167,7 +166,7 @@ namespace HttpsProxyCSharp
                     "proxy-connection", "Connection: close");
                 headers_bytes = Encoding.UTF8.GetBytes(headers);
             }
-            else if (type == typeof(SslStream))
+            else if (local.GetType() == typeof(SslStream))
             {
                 //https不需要处理？
             }

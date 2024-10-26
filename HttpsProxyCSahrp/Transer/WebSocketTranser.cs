@@ -141,7 +141,8 @@ namespace HttpsProxyCSharp.Transer
 
         async Task<byte[]> TransWebsocketData(string host, byte[] data, bool up)
         {
-            Console.WriteLine((up ? "WSRequest:" : "WSResponse: ") + Utils.Bin2Hex(data, 0, -1, " "));
+            string dir = up ? "WSRequest :" : "WSResponse:";
+            Console.WriteLine("{0} {1}", dir, Utils.Bin2Hex(data, 0, -1, " "));
             return data;
         }
 
