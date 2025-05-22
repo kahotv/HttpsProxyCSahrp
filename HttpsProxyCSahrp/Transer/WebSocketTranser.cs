@@ -112,8 +112,9 @@ namespace HttpsProxyCSharp.Transer
                     }
                 }
 
-                tmp = await TransWebsocketData(host, tmp.Take((int)len).ToArray(), up);
+                tmp = tmp.Take((int)len).ToArray();
 
+                PrintWebsocket(host, tmp, up);
 
                 //写入remote
                 int n = 0;
@@ -139,11 +140,10 @@ namespace HttpsProxyCSharp.Transer
             }
         }
 
-        async Task<byte[]> TransWebsocketData(string host, byte[] data, bool up)
+        void PrintWebsocket(string host, byte[] data, bool up)
         {
             string dir = up ? "WSRequest :" : "WSResponse:";
             Console.WriteLine("{0} {1}", dir, Utils.Bin2Hex(data, 0, -1, " "));
-            return data;
         }
 
 

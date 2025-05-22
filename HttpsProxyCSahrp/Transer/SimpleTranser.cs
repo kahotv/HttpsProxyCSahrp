@@ -14,24 +14,36 @@ namespace HttpsProxyCSharp.Transer
         {
             //Console.WriteLine($"[{host}] Trans begin");
 
-            var taskUp = TransNormal(host, local, remote);
-            var taskDown = TransNormal(host, remote, local);
+            var cup = new CancellationTokenSource();
+            var cdown = new CancellationTokenSource();
 
-            await taskUp;
-            await taskDown;
+            var taskUp = TransNormal(host, local, remote, cup.Token);
+            var taskDown = TransNormal(host, remote, local, cdown.Token);
+
+            await Task.WhenAny(taskUp, taskDown);
+
+            //等待数据发完
+            await Task.Delay(1000);                 
+
+            //取消另一端
+            cup.Cancel(false);
+            cdown.Cancel(false);
+
+            await Task.WhenAll(taskUp, taskDown);
+
             //Console.WriteLine($"[{host}] Trans end");
         }
 
-        async Task TransNormal(string host, Stream from, Stream to)
+        async Task TransNormal(string host, Stream from, Stream to, CancellationToken ct)
         {
             try
             {
                 byte[] buf = new byte[1024];
 
-                while (true)
+                while (!ct.IsCancellationRequested)
                 {
 
-                    int n = await from.ReadAsync(buf, 0, buf.Length);
+                    int n = await from.ReadAsync(buf, 0, buf.Length, ct);
                     if (n <= 0)
                     {
                         throw new Exception("cancelled");
