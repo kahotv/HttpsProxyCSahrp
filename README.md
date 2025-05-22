@@ -26,11 +26,10 @@ https://github.com/kahotv/HttpsProxyCpp
     详见
 
     ```c#
-    async Task<byte[]> TransWebsocketData(string host, byte[] data, bool up)
+    void PrintWebsocket(string host, byte[] data, bool up)
     {
         string dir = up ? "WSRequest :" : "WSResponse:";
         Console.WriteLine("{0} {1}", dir, Utils.Bin2Hex(data, 0, -1, " "));
-        return data;
     }
     ```
     
